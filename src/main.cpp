@@ -1,5 +1,8 @@
 #include <iostream>
 #include "sqlite3.h"
+#include <vector>
+#include <any>
+#include <memory>
 
 void insert(sqlite3* db, const std::string sql) {
     int result = sqlite3_exec(db, sql.c_str(), nullptr, nullptr, nullptr);
@@ -10,47 +13,75 @@ void insert(sqlite3* db, const std::string sql) {
     }
 }
 
-void show_tasks(sqlite3* db) {
-    std::string sql = "SELECT * FROM tasks;";
+std::vector<std::vector<std::any>> fetch_data(sqlite3* db, std::string query) {
+
+    std::vector<std::vector<std::any>> fetched_data;
     sqlite3_stmt* stmt;
 
-    if (sqlite3_prepare_v2(db, sql.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
+    if (sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
         std::cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << std::endl;
-        return;
+        return fetched_data;
     }
 
     int row_count = sqlite3_column_count(stmt);
 
     // loop through rows
+    int row_number = 0;
     while (sqlite3_step(stmt) == SQLITE_ROW) {
-        for (int i = 0; i < row_count; i++)
+        int column_count = sqlite3_column_count(stmt);
+        for (int i = 0; i < column_count; i++)
         {
-            int id = sqlite3_column_int(stmt, 0);
+            std::vector<std::any> row_values;
+
+            //int id = sqlite3_column_int(stmt, 0);
             const char* columnName = sqlite3_column_name(stmt, i);
 
             std::string name;
-            int done;
-            switch (sqlite3_column_type(stmt, i)) {
+            bool done = false;
+
+            int columnType = sqlite3_column_type(stmt, i);
+            switch (columnType) {
                 case SQLITE_TEXT:
-                    name = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
+                    row_values.push_back(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1)));
+                    //std::string columnValue = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
                     break;
                 case SQLITE_INTEGER:
-                    done = sqlite3_column_int(stmt, i);
+                    row_values.push_back(sqlite3_column_int(stmt, i));
                     break;
             }
             std::cout << name << " | " << done;
-
-            std::cout << " | ";
+            fetched_data.push_back(row_values);
+            //std::cout << " | ";
         }
         std::cout << std::endl;
+        row_number++;
+    }
+    sqlite3_finalize(stmt);
+
+    return fetched_data;
+}
+
+static void addTask(sqlite3 *db, std::string taskName, std::string deadline) {
+    std::string insertQuery = "INSERT INTO tasks (name, deadline) VALUES ('" + taskName + "','" + deadline + "');";
+
+    char* errorMessage;
+    int resultCode = sqlite3_exec(db, insertQuery.c_str(), nullptr, nullptr, &errorMessage);
+    if (resultCode != SQLITE_OK) {
+        std::cout << resultCode << std::endl;
+        std::cout << *errorMessage << std::endl;
+        return;
     }
 
-    sqlite3_finalize(stmt);
+    std::cout << "Task was added";
+
+    return;
 }
 
 int main() {
     sqlite3* db;
-    if (sqlite3_open_v2("MyDBasdf", &db, SQLITE_OPEN_READWRITE, nullptr) != SQLITE_OK) {
+    int returnCode = sqlite3_open_v2("../../../../database/tasks_database.db", &db, SQLITE_OPEN_READWRITE, nullptr);
+    if (returnCode != SQLITE_OK) {
+        std::cout << returnCode << std::endl;
         std::cout << "Failed to open DB: " << sqlite3_errmsg(db) << std::endl;
         return 1;
     }
@@ -64,18 +95,30 @@ int main() {
 
     int choice;
     //std::cin >> choice;
-    choice = 0;
+    choice = 1;
+
+    std::string query = "SELECT name, deadline, done FROM tasks;";
+    std::vector<std::vector<std::any>> fetched_data = fetch_data(db, query);
 
     switch (choice) {
         case 0:
             std::cout << "Tasks: " << std::endl;
-            show_tasks(db);
+            //std::string query = "SELECT name, deadline, done FROM tasks;";
+            //std::vector<std::vector<std::any>> fetched_data = fetch_data(db, query);
             break;
         case 1:
-            std::cout << "add task"; break;
+        {
+            std::cout << "Adding task";
+            std::string TaskName = "test0";
+            std::string deadline = "2025-10-20";
+            addTask(db, TaskName, deadline);
+            break;
+        }
         case 2:
             std::cout << "delete task"; break;
-    } 
+    }
+
+    std::cout << "done";
 
     return 0;
 }
