@@ -3,6 +3,7 @@
 #include <vector>
 #include <any>
 #include <memory>
+#include <format>
 
 void insert(sqlite3* db, const std::string sql) {
     int result = sqlite3_exec(db, sql.c_str(), nullptr, nullptr, nullptr);
@@ -72,8 +73,20 @@ static void addTask(sqlite3 *db, std::string taskName, std::string deadline) {
         return;
     }
 
-    std::cout << "Task was added";
+    std::cout << "Task was added" << std::endl;
+    return;
+}
 
+static void deleteTask(sqlite3* db, int taskId) {
+    std::string deleteQuery = std::format("DELETE FROM tasks WHERE id = {};", taskId);
+    char* errorMessage;
+    int resultCode = sqlite3_exec(db, deleteQuery.c_str(), nullptr, nullptr, &errorMessage);
+    if (resultCode != SQLITE_OK) {
+        std::cout << resultCode << ": " << errorMessage << std::endl;
+        return;
+    }
+    
+    std::cout << "Task was deleted" << std::endl;
     return;
 }
 
@@ -86,16 +99,9 @@ int main() {
         return 1;
     }
 
-    
-
-    //std::string sql = "";
-    //if (sqlite3_exec(db, sql.c_str(), nullptr, nullptr, nullptr) == SQLITE_OK) {
-    //    std::cout << "Task added succesfully!" << std::endl;
-    //}
-
     int choice;
     //std::cin >> choice;
-    choice = 1;
+    choice = 2;
 
     std::string query = "SELECT name, deadline, done FROM tasks;";
     std::vector<std::vector<std::any>> fetched_data = fetch_data(db, query);
@@ -103,8 +109,6 @@ int main() {
     switch (choice) {
         case 0:
             std::cout << "Tasks: " << std::endl;
-            //std::string query = "SELECT name, deadline, done FROM tasks;";
-            //std::vector<std::vector<std::any>> fetched_data = fetch_data(db, query);
             break;
         case 1:
         {
@@ -115,7 +119,9 @@ int main() {
             break;
         }
         case 2:
-            std::cout << "delete task"; break;
+            std::cout << "delete task";
+            deleteTask(db, 4);
+            break;
     }
 
     std::cout << "done";
