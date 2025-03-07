@@ -5,12 +5,40 @@
 #include <memory>
 #include <format>
 
-void insert(sqlite3* db, const std::string sql) {
-    int result = sqlite3_exec(db, sql.c_str(), nullptr, nullptr, nullptr);
 
-    if (result != SQLITE_OK) {
-        // TODO properly out error
-        std::cout << "query failed" << std::endl;
+static void showTasksPreview(sqlite3* db) {
+    // shows first 5 tasks
+    /*std::string selectQuery = "SELECT * FROM tasks LIMIT 5;";
+    char* errorMessage;
+    int resultCode = sqlite3_exec(db, selectQuery.c_str(), nullptr, nullptr, &errorMessage);
+    if (resultCode != SQLITE_OK) {
+        std::cout << resultCode << ": " << errorMessage << std::endl;
+        return;
+    }*/
+
+    std::string selectQuery = "SELECT name, deadline, done FROM tasks LIMIT 5;";
+
+    sqlite3_stmt* stmt;
+    if (sqlite3_prepare_v2(db, selectQuery.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
+        std::cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << std::endl;
+    }
+
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        for (int i = 0; i < 3; i++) {
+            int columnType = sqlite3_column_type(stmt, i);
+
+            switch (columnType) {
+            case SQLITE_TEXT:
+
+                std::cout << sqlite3_column_text(stmt, i) << " | ";
+                //row_values.push_back(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1)));
+                break;
+            case SQLITE_INTEGER:
+                std::cout << sqlite3_column_int(stmt, i) << " | ";
+                break;
+            }
+        }
+        std::cout << std::endl;
     }
 }
 
@@ -90,6 +118,7 @@ static void deleteTask(sqlite3* db, int taskId) {
     return;
 }
 
+
 int main() {
     sqlite3* db;
     int returnCode = sqlite3_open_v2("../../../../database/tasks_database.db", &db, SQLITE_OPEN_READWRITE, nullptr);
@@ -98,6 +127,9 @@ int main() {
         std::cout << "Failed to open DB: " << sqlite3_errmsg(db) << std::endl;
         return 1;
     }
+
+    // always the show the first 5 tasks
+    showTasksPreview(db);
 
     int choice;
     //std::cin >> choice;
