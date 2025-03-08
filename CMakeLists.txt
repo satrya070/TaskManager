@@ -6,16 +6,16 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # set output directories for builds
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-#set_target_properties(TaskManager PROPERTIES LINKER_LANGUAGE CXX)
 
+include_directories(${PROJECT_SOURCE_DIR}/include)
+file(GLOB SOURCES "src/*.cpp")
 
 add_library(sqlite3 STATIC external/sqlite/lib/sqlite3.c)
-target_include_directories(sqlite3 PUBLIC external/sqlite/include/)
 
-add_executable(TaskManager src/main.cpp "include/Task.h" "src/Task.cpp")
+add_executable(TaskManager src/main.cpp ${SOURCES})
 
 # include headers
-target_include_directories(TaskManager PRIVATE include/)
+target_include_directories(TaskManager PRIVATE include/ external/sqlite/include)
 target_link_libraries(TaskManager PRIVATE sqlite3)
 
 # cross platform settings

@@ -4,6 +4,8 @@
 #include <any>
 #include <memory>
 #include <format>
+#include "Manager.h"
+#include "Command.h"
 
 
 static void showTasksPreview(sqlite3* db) {
@@ -20,7 +22,6 @@ static void showTasksPreview(sqlite3* db) {
 
             switch (columnType) {
             case SQLITE_TEXT:
-
                 std::cout << sqlite3_column_text(stmt, i) << " | ";
                 //row_values.push_back(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1)));
                 break;
@@ -73,14 +74,18 @@ int main() {
         return 1;
     }
 
+    Manager taskManager;
+    taskManager.setCommand(std::make_unique<showCommand>());
+    taskManager.executeCommand();
+
     // always the show the first 5 tasks
     showTasksPreview(db);
 
-    int choice;
+    int input;
     //std::cin >> choice;
-    choice = -1;
+    input = 0;
 
-    switch (choice) {
+    /*switch (choice) {
         case 0:
             std::cout << "Tasks: " << std::endl;
             break;
@@ -96,7 +101,7 @@ int main() {
             std::cout << "delete task";
             deleteTask(db, 4);
             break;
-    }
+    }*/
 
     std::cout << "done";
 
