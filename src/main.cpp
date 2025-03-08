@@ -7,15 +7,6 @@
 
 
 static void showTasksPreview(sqlite3* db) {
-    // shows first 5 tasks
-    /*std::string selectQuery = "SELECT * FROM tasks LIMIT 5;";
-    char* errorMessage;
-    int resultCode = sqlite3_exec(db, selectQuery.c_str(), nullptr, nullptr, &errorMessage);
-    if (resultCode != SQLITE_OK) {
-        std::cout << resultCode << ": " << errorMessage << std::endl;
-        return;
-    }*/
-
     std::string selectQuery = "SELECT name, deadline, done FROM tasks LIMIT 5;";
 
     sqlite3_stmt* stmt;
@@ -40,55 +31,9 @@ static void showTasksPreview(sqlite3* db) {
         }
         std::cout << std::endl;
     }
-}
-
-std::vector<std::vector<std::any>> fetch_data(sqlite3* db, std::string query) {
-
-    std::vector<std::vector<std::any>> fetched_data;
-    sqlite3_stmt* stmt;
-
-    if (sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
-        std::cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << std::endl;
-        return fetched_data;
-    }
-
-    int row_count = sqlite3_column_count(stmt);
-
-    // loop through rows
-    int row_number = 0;
-    while (sqlite3_step(stmt) == SQLITE_ROW) {
-        int column_count = sqlite3_column_count(stmt);
-        for (int i = 0; i < column_count; i++)
-        {
-            std::vector<std::any> row_values;
-
-            //int id = sqlite3_column_int(stmt, 0);
-            const char* columnName = sqlite3_column_name(stmt, i);
-
-            std::string name;
-            bool done = false;
-
-            int columnType = sqlite3_column_type(stmt, i);
-            switch (columnType) {
-                case SQLITE_TEXT:
-                    row_values.push_back(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1)));
-                    //std::string columnValue = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
-                    break;
-                case SQLITE_INTEGER:
-                    row_values.push_back(sqlite3_column_int(stmt, i));
-                    break;
-            }
-            std::cout << name << " | " << done;
-            fetched_data.push_back(row_values);
-            //std::cout << " | ";
-        }
-        std::cout << std::endl;
-        row_number++;
-    }
     sqlite3_finalize(stmt);
-
-    return fetched_data;
 }
+
 
 static void addTask(sqlite3 *db, std::string taskName, std::string deadline) {
     std::string insertQuery = "INSERT INTO tasks (name, deadline) VALUES ('" + taskName + "','" + deadline + "');";
@@ -133,10 +78,7 @@ int main() {
 
     int choice;
     //std::cin >> choice;
-    choice = 2;
-
-    std::string query = "SELECT name, deadline, done FROM tasks;";
-    std::vector<std::vector<std::any>> fetched_data = fetch_data(db, query);
+    choice = -1;
 
     switch (choice) {
         case 0:
