@@ -53,6 +53,23 @@
       "description": "Target Windows (32-bit) with the Visual Studio development environment. (RelWithDebInfo)",
       "inherits": "x86-debug",
       "cacheVariables": { "CMAKE_BUILD_TYPE": "Release" }
+    },
+    {
+      "name": "linux-wsl",
+      "hidden": false,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_C_COMPILER": "gcc",
+        "CMAKE_CXX_COMPILER": "g++"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "linux-wsl-debug",
+      "configurePreset": "linux-wsl"
     }
   ]
 }
