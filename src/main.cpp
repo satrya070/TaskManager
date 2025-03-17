@@ -24,7 +24,6 @@ static void showTasksPreview(sqlite3* db) {
             switch (columnType) {
             case SQLITE_TEXT:
                 std::cout << sqlite3_column_text(stmt, i) << " | ";
-                //row_values.push_back(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1)));
                 break;
             case SQLITE_INTEGER:
                 std::cout << sqlite3_column_int(stmt, i) << " | ";
@@ -55,32 +54,19 @@ int main() {
 
     Manager taskManager;
 
+    // TODO ---- refactor to gui
+
     // set and execute command
     //taskManager.setCommand(std::make_unique<addCommand>(db, "buy eggs", "2025-06-14"));
     //taskManager.executeCommand();
 
     // delete command
-    taskManager.setCommand(std::make_unique<deleteCommand>(db, 10));
-    taskManager.executeCommand();
+    //taskManager.setCommand(std::make_unique<deleteCommand>(db, 10));
+    //taskManager.executeCommand();
 
-    // TODO refactor to GUI
-    /*switch (choice) {
-        case 0:
-            std::cout << "Tasks: " << std::endl;
-            break;
-        case 1:
-        {
-            std::cout << "Adding task";
-            std::string TaskName = "test0";
-            std::string deadline = "2025-10-20";
-            addTask(db, TaskName, deadline);
-            break;
-        }
-        case 2:
-            std::cout << "delete task";
-            deleteTask(db, 4);
-            break;
-    }*/
+    // TODO
+    //update command
+    
 
     std::cout << "done";
 
