@@ -8,6 +8,11 @@
 #include "Command.h"
 #include "Command.cpp"
 
+#include "imgui.h"
+#include "imgui_impl_sdl3.h"
+#include "imgui_impl_sdlrenderer3.h"
+#include "SDL3/SDL.h"
+
 
 static void showTasksPreview(sqlite3* db) {
     std::string selectQuery = "SELECT name, deadline, done FROM tasks LIMIT 5;";
