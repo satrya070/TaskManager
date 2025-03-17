@@ -85,6 +85,10 @@ int main() {
     //std::cin >> choice;
     input = 0;
 
+    // set and execute command
+    taskManager.setCommand(std::make_unique<addCommand>(db, "clean trenches", "2025-06-12"));
+    taskManager.executeCommand();
+
     /*switch (choice) {
         case 0:
             std::cout << "Tasks: " << std::endl;
