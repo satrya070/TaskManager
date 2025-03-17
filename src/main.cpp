@@ -6,6 +6,7 @@
 #include <format>
 #include "Manager.h"
 #include "Command.h"
+#include "Command.cpp"
 
 
 static void showTasksPreview(sqlite3* db) {
@@ -36,35 +37,6 @@ static void showTasksPreview(sqlite3* db) {
 }
 
 
-static void addTask(sqlite3 *db, std::string taskName, std::string deadline) {
-    std::string insertQuery = "INSERT INTO tasks (name, deadline) VALUES ('" + taskName + "','" + deadline + "');";
-
-    char* errorMessage;
-    int resultCode = sqlite3_exec(db, insertQuery.c_str(), nullptr, nullptr, &errorMessage);
-    if (resultCode != SQLITE_OK) {
-        std::cout << resultCode << std::endl;
-        std::cout << *errorMessage << std::endl;
-        return;
-    }
-
-    std::cout << "Task was added" << std::endl;
-    return;
-}
-
-static void deleteTask(sqlite3* db, int taskId) {
-    std::string deleteQuery = std::format("DELETE FROM tasks WHERE id = {};", taskId);
-    char* errorMessage;
-    int resultCode = sqlite3_exec(db, deleteQuery.c_str(), nullptr, nullptr, &errorMessage);
-    if (resultCode != SQLITE_OK) {
-        std::cout << resultCode << ": " << errorMessage << std::endl;
-        return;
-    }
-    
-    std::cout << "Task was deleted" << std::endl;
-    return;
-}
-
-
 int main() {
     sqlite3* db;
     int returnCode = sqlite3_open_v2("../../../../database/tasks_database.db", &db, SQLITE_OPEN_READWRITE, nullptr);
@@ -74,10 +46,6 @@ int main() {
         return 1;
     }
 
-    Manager taskManager;
-    taskManager.setCommand(std::make_unique<showCommand>());
-    taskManager.executeCommand();
-
     // always the show the first 5 tasks
     showTasksPreview(db);
 
@@ -85,10 +53,17 @@ int main() {
     //std::cin >> choice;
     input = 0;
 
+    Manager taskManager;
+
     // set and execute command
-    taskManager.setCommand(std::make_unique<addCommand>(db, "clean trenches", "2025-06-12"));
+    //taskManager.setCommand(std::make_unique<addCommand>(db, "buy eggs", "2025-06-14"));
+    //taskManager.executeCommand();
+
+    // delete command
+    taskManager.setCommand(std::make_unique<deleteCommand>(db, 10));
     taskManager.executeCommand();
 
+    // TODO refactor to GUI
     /*switch (choice) {
         case 0:
             std::cout << "Tasks: " << std::endl;
