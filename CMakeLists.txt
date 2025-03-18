@@ -6,6 +6,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include(FetchContent)
 
+# find openGL
+find_package(OpenGL REQUIRED)
+
 # fetch SDL3
 FetchContent_Declare(
     SDL3
@@ -30,6 +33,7 @@ add_library(imgui_lib STATIC
     ${imgui_SOURCE_DIR}/imgui_tables.cpp
     ${imgui_SOURCE_DIR}/imgui_widgets.cpp
     ${imgui_SOURCE_DIR}/backends/imgui_impl_sdl3.cpp
+    ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp
 )
 target_include_directories(imgui_lib PUBLIC ${imgui_SOURCE_DIR} ${imgui_SOURCE_DIR}/backends)
 target_link_libraries(imgui_lib SDL3::SDL3)
@@ -46,7 +50,7 @@ add_executable(TaskManager src/main.cpp ${SOURCES})
 
 # include headers
 target_include_directories(TaskManager PRIVATE include/ external/sqlite/include)
-target_link_libraries(TaskManager PRIVATE sqlite3 imgui_lib SDL3::SDL3)
+target_link_libraries(TaskManager PRIVATE sqlite3 imgui_lib SDL3::SDL3 OpenGL::GL)
 
 # cross platform settings
 #[[if (CMAKE_SYSTEM_NAME STREQUAL "Windows")

@@ -10,8 +10,11 @@
 
 #include "imgui.h"
 #include "imgui_impl_sdl3.h"
-#include "imgui_impl_sdlrenderer3.h"
+#include "imgui_impl_opengl3.h"
+//#include "imgui_impl_sdlrenderer3.h"
 #include "SDL3/SDL.h"
+#include "SDL3/SDL_opengl.h"
+
 
 
 static void showTasksPreview(sqlite3* db) {
@@ -71,7 +74,86 @@ int main() {
 
     // TODO
     //update command
+
+
+    //----- GUI -----------------------------
+
+    /*SDL_Log("Available SDL video drivers:");
+    int numDrivers = SDL_GetNumVideoDrivers();
+    for (int i = 0; i < numDrivers; i++) {
+        SDL_Log("%s", SDL_GetVideoDriver(i));
+    }*/
+ 
+    // init SDL3
+    /*if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+        std::cout << SDL_INIT_GAMEPAD << std::endl;
+        std::cout << SDL_GetError() << SDL_INIT_VIDEO << std::endl;
+        SDL_Log("Failed to initialize SDL: %s, %d", SDL_GetError(), SDL_INIT_VIDEO);
+        return -1;
+    }*/
+
+    if (!SDL_Init(SDL_INIT_VIDEO)) {
+        SDL_Log("Failed to initialize SDL: %s", SDL_GetError());
+        return -1;
+    }
     
+    // setup window
+    SDL_Window* window = SDL_CreateWindow("TaskManager", 800, 600, SDL_WINDOW_OPENGL);
+    SDL_GLContext gl_context = SDL_GL_CreateContext(window);
+    SDL_GL_MakeCurrent(window, gl_context);
+    
+    if (!window) {
+        std::cout << SDL_GetError() << std::endl;
+        return -1;
+    }
+
+    // setup imgui
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+
+    // setup platform render backends
+    ImGui_ImplSDL3_InitForOpenGL(window, gl_context);
+    ImGui_ImplOpenGL3_Init("#version 330");
+
+    bool running = true;
+    while (running) {
+        SDL_Event event;
+        while (SDL_PollEvent(&event)) {
+            ImGui_ImplSDL3_ProcessEvent(&event);
+            if (event.type == SDL_EVENT_QUIT)
+                running = false;
+            if (event.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED && event.window.windowID == SDL_GetWindowID(window))
+                running = false;
+        }
+
+        // start imgui frame
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplSDL3_NewFrame();
+        ImGui::NewFrame();
+
+        // create a simple window
+        //ImGui::Render();
+        //SDL_GL_MakeCurrent(window, gl_context);
+        ImGui::ShowDemoWindow();
+
+        // render
+        ImGui::Render();
+        //glViewport(0, 0, (int)io.DisplaySize.x, (int)io.DisplaySize.y);
+        glClearColor(0.45f, 0.55f, 0.60f, 1.00f);
+        glClear(GL_COLOR_BUFFER_BIT);
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        SDL_GL_SwapWindow(window);
+    }
+
+    // cleanup
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplSDL3_Shutdown();
+    ImGui::DestroyContext();
+
+    SDL_GL_DestroyContext(gl_context);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
 
     std::cout << "done";
 
