@@ -7,15 +7,39 @@
 #include "Manager.h"
 #include "Command.h"
 #include "Command.cpp"
+#include <fstream>
+#include <sstream>
 
 #include "imgui.h"
 #include "imgui_impl_sdl3.h"
 #include "imgui_impl_opengl3.h"
-//#include "imgui_impl_sdlrenderer3.h"
 #include "SDL3/SDL.h"
 #include "SDL3/SDL_opengl.h"
 
 
+bool initTables(sqlite3* db, const std::string& filePath) {
+    // creates the database tables if they don't exist yet
+    std::ifstream file(filePath);
+    if (!file) {
+        std::cerr << "Error: file doesn't exist." << std::endl;
+        return false;
+    }
+
+    // read content into string buffer
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+    std::string sql = buffer.str();
+
+    // execute sql
+    char* errorMessage = nullptr;
+    if (sqlite3_exec(db, sql.c_str(), nullptr, nullptr, &errorMessage) != SQLITE_OK) {
+        std::cerr << "Failed to create tables with: " << filePath << std::endl;
+        sqlite3_free(errorMessage);
+        return false;
+    }
+
+    return true;
+}
 
 static void showTasksPreview(sqlite3* db) {
     std::string selectQuery = "SELECT name, deadline, done FROM tasks LIMIT 5;";
@@ -53,6 +77,8 @@ int main() {
         std::cout << returnCode << ": Failed to open DB: " << sqlite3_errmsg(db) << std::endl;
         return 1;
     }
+
+    initTables(db, "setup.sql");
 
     // always the show the first 5 tasks
     showTasksPreview(db);

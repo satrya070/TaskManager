@@ -52,12 +52,17 @@ add_executable(TaskManager src/main.cpp ${SOURCES})
 target_include_directories(TaskManager PRIVATE include/ external/sqlite/include)
 target_link_libraries(TaskManager PRIVATE sqlite3 imgui_lib SDL3::SDL3 OpenGL::GL)
 
-# 
+# post build commands
 add_custom_command(TARGET TaskManager COMMAND ${CMAKE_COMMAND} -E copy_if_different
     $<TARGET_RUNTIME_DLLS:TaskManager>
     $<TARGET_FILE_DIR:TaskManager>
 )
 set_property(TARGET TaskManager PROPERTY ENABLE_EXPORTS ON)  # required for finding DDLs
+
+add_custom_command(TARGET TaskManager COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    ${CMAKE_SOURCE_DIR}/database/setup.sql
+    $<TARGET_FILE_DIR:TaskManager>
+)
 
 # cross platform settings
 #[[if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
