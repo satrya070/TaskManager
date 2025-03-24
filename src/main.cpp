@@ -46,10 +46,11 @@ static void showTasksPreview(sqlite3* db) {
 
 int main() {
     sqlite3* db;
-    int returnCode = sqlite3_open_v2("../../../../database/tasks_database.db", &db, SQLITE_OPEN_READWRITE, nullptr);
+    int returnCode = sqlite3_open_v2(
+        "tasks_database.db", &db, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, nullptr
+    );
     if (returnCode != SQLITE_OK) {
-        std::cout << returnCode << std::endl;
-        std::cout << "Failed to open DB: " << sqlite3_errmsg(db) << std::endl;
+        std::cout << returnCode << ": Failed to open DB: " << sqlite3_errmsg(db) << std::endl;
         return 1;
     }
 
