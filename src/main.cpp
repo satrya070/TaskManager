@@ -159,10 +159,40 @@ int main() {
         ImGui_ImplSDL3_NewFrame();
         ImGui::NewFrame();
 
-        // create a simple window
-        //ImGui::Render();
-        //SDL_GL_MakeCurrent(window, gl_context);
-        ImGui::ShowDemoWindow();
+        // confire to fill screen
+        ImGui::SetNextWindowPos(ImVec2(0, 0));
+        ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize);
+        ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration |
+            ImGuiWindowFlags_NoMove |
+            ImGuiWindowFlags_NoResize |
+            ImGuiWindowFlags_NoCollapse;
+
+        // GUI
+        ImGui::Begin("Task Manager");
+
+
+        ImGui::SameLine();
+        ImGui::Button("Add");
+        ImGui::Separator();
+        ImGui::TextWrapped("asdfsafasdfdasfdsaf");
+        static char buff[32];
+        ImGui::InputText("default", buff, 32);
+        ImGui::BulletText("bullet 1");
+
+        static int clicked = 0;
+        if (ImGui::Button("Delete task")) {
+            std::cout << "delete task!" << std::endl;
+            clicked++;
+        }
+        if (clicked) {
+            ImGui::SameLine();
+            ImGui::Text("Thanks for clicking me!");
+        }
+
+        ImGui::End();
+
+        // DEMO
+        // ImGui::ShowDemoWindow();
 
         // render
         ImGui::Render();
