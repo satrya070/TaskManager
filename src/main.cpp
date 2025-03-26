@@ -125,7 +125,8 @@ int main() {
     }
     
     // setup window
-    SDL_Window* window = SDL_CreateWindow("TaskManager", 800, 600, SDL_WINDOW_OPENGL);
+    SDL_Window* window = SDL_CreateWindow("TaskManager", 800, 600,
+        SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
     SDL_GLContext gl_context = SDL_GL_CreateContext(window);
     SDL_GL_MakeCurrent(window, gl_context);
     
@@ -168,8 +169,7 @@ int main() {
             ImGuiWindowFlags_NoCollapse;
 
         // GUI
-        ImGui::Begin("Task Manager");
-
+        ImGui::Begin("Task Manager", nullptr, window_flags);
 
         ImGui::SameLine();
         ImGui::Button("Add");
@@ -188,6 +188,17 @@ int main() {
             ImGui::SameLine();
             ImGui::Text("Thanks for clicking me!");
         }
+        ImGui::Separator();
+        ImGui::BeginTable("table", 3);
+        ImGui::TableSetupColumn("Task", ImGuiTableColumnFlags_WidthFixed, 200.f); // , ImGuiTableColumnFlags_WidthFixed);
+        ImGui::TableSetupColumn("date", ImGuiTableColumnFlags_WidthFixed, 100.f);
+        ImGui::TableSetupColumn("done", ImGuiTableColumnFlags_WidthFixed, 100.f);
+        ImGui::TableHeadersRow();
+
+        ImGui::TableNextRow();
+        ImGui::TableSetColumnIndex(0);
+        ImGui::Text("Mowing the lawn");
+        ImGui::EndTable();
 
         ImGui::End();
 
