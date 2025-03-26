@@ -7,6 +7,7 @@
 #include "Manager.h"
 #include "Command.h"
 #include "Command.cpp"
+#include "Task.h"
 #include <fstream>
 #include <sstream>
 
@@ -41,7 +42,7 @@ bool initTables(sqlite3* db, const std::string& filePath) {
     return true;
 }
 
-static void showTasksPreview(sqlite3* db) {
+static std::vector<Task> showTasksPreview(sqlite3* db) {
     std::string selectQuery = "SELECT name, deadline, done FROM tasks LIMIT 5;";
 
     sqlite3_stmt* stmt;
@@ -49,22 +50,32 @@ static void showTasksPreview(sqlite3* db) {
         std::cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << std::endl;
     }
 
+    std::vector<Task> tasks;
     while (sqlite3_step(stmt) == SQLITE_ROW) {
+        std::string task_name;
+
+        const unsigned char* text;
         for (int i = 0; i < 3; i++) {
             int columnType = sqlite3_column_type(stmt, i);
 
             switch (columnType) {
             case SQLITE_TEXT:
-                std::cout << sqlite3_column_text(stmt, i) << " | ";
+                text = sqlite3_column_text(stmt, i);
+                task_name = text ? reinterpret_cast<const char*>(text) : "";
+                std::cout << task_name << " | ";
                 break;
             case SQLITE_INTEGER:
                 std::cout << sqlite3_column_int(stmt, i) << " | ";
                 break;
             }
         }
+        tasks.emplace_back(task_name);
+        //tasks.push_back(std::make_unique<Task>(task_name));
         std::cout << std::endl;
     }
     sqlite3_finalize(stmt);
+
+    return tasks;
 }
 
 
@@ -81,7 +92,11 @@ int main() {
     initTables(db, "setup.sql");
 
     // always the show the first 5 tasks
-    showTasksPreview(db);
+    std::vector<Task> tasks = showTasksPreview(db);
+    std::cout << tasks.size() << std::endl;
+    for (const Task& task : tasks) {
+        std::cout << task.getTaskName() << std::endl;
+    }
 
     int input;
     //std::cin >> choice;
@@ -104,20 +119,6 @@ int main() {
 
 
     //----- GUI -----------------------------
-
-    /*SDL_Log("Available SDL video drivers:");
-    int numDrivers = SDL_GetNumVideoDrivers();
-    for (int i = 0; i < numDrivers; i++) {
-        SDL_Log("%s", SDL_GetVideoDriver(i));
-    }*/
- 
-    // init SDL3
-    /*if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-        std::cout << SDL_INIT_GAMEPAD << std::endl;
-        std::cout << SDL_GetError() << SDL_INIT_VIDEO << std::endl;
-        SDL_Log("Failed to initialize SDL: %s, %d", SDL_GetError(), SDL_INIT_VIDEO);
-        return -1;
-    }*/
 
     if (!SDL_Init(SDL_INIT_VIDEO)) {
         SDL_Log("Failed to initialize SDL: %s", SDL_GetError());
@@ -145,7 +146,7 @@ int main() {
     ImGui_ImplOpenGL3_Init("#version 330");
 
     // initial window status
-    bool showArchiveWindow = true;
+    bool showArchiveWindow = false;
 
     bool running = true;
     while (running) {
@@ -197,9 +198,12 @@ int main() {
         ImGui::TableSetupColumn("done", ImGuiTableColumnFlags_WidthFixed, 100.f);
         ImGui::TableHeadersRow();
 
-        ImGui::TableNextRow();
-        ImGui::TableSetColumnIndex(0);
-        ImGui::Text("Mowing the lawn");
+        for (const Task& task : tasks) {
+            ImGui::TableNextRow();
+            ImGui::TableSetColumnIndex(0); ImGui::Text("Task name");
+            ImGui::TableSetColumnIndex(1); ImGui::Text(task.getTaskName().c_str());
+        }
+
         ImGui::EndTable();
 
         ImGui::End();
