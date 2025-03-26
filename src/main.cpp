@@ -144,6 +144,9 @@ int main() {
     ImGui_ImplSDL3_InitForOpenGL(window, gl_context);
     ImGui_ImplOpenGL3_Init("#version 330");
 
+    // initial window status
+    bool showArchiveWindow = true;
+
     bool running = true;
     while (running) {
         SDL_Event event;
@@ -171,9 +174,6 @@ int main() {
         // GUI
         ImGui::Begin("Task Manager", nullptr, window_flags);
 
-        ImGui::SameLine();
-        ImGui::Button("Add");
-        ImGui::Separator();
         ImGui::TextWrapped("asdfsafasdfdasfdsaf");
         static char buff[32];
         ImGui::InputText("default", buff, 32);
@@ -189,7 +189,9 @@ int main() {
             ImGui::Text("Thanks for clicking me!");
         }
         ImGui::Separator();
-        ImGui::BeginTable("table", 3);
+
+        ImGuiTableFlags tableFlags = ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable;
+        ImGui::BeginTable("table", 3, tableFlags);
         ImGui::TableSetupColumn("Task", ImGuiTableColumnFlags_WidthFixed, 200.f); // , ImGuiTableColumnFlags_WidthFixed);
         ImGui::TableSetupColumn("date", ImGuiTableColumnFlags_WidthFixed, 100.f);
         ImGui::TableSetupColumn("done", ImGuiTableColumnFlags_WidthFixed, 100.f);
@@ -201,6 +203,15 @@ int main() {
         ImGui::EndTable();
 
         ImGui::End();
+
+        // archived window
+        if (showArchiveWindow) {
+            ImGui::Begin("archive", &showArchiveWindow);
+            ImGui::Text("asdf");
+            ImGui::End();
+
+            //if(ImGui::Button("Close"))
+        }
 
         // DEMO
         // ImGui::ShowDemoWindow();
