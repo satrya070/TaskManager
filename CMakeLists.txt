@@ -25,6 +25,9 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(imgui)
 
+# add googletest tests
+add_subdirectory(tests)
+
 # create imgui library target
 add_library(imgui_lib STATIC
     ${imgui_SOURCE_DIR}/imgui.cpp
