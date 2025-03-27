@@ -43,7 +43,7 @@ bool initTables(sqlite3* db, const std::string& filePath) {
 }
 
 static std::vector<Task> showTasksPreview(sqlite3* db) {
-    std::string selectQuery = "SELECT name, deadline, done FROM tasks LIMIT 5;";
+    std::string selectQuery = "SELECT name, deadline, done FROM tasks;";
 
     sqlite3_stmt* stmt;
     if (sqlite3_prepare_v2(db, selectQuery.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
@@ -196,7 +196,11 @@ int main() {
             ImGui::Text("Thanks for clicking me!");
         }
         if (ImGui::Button("add task")) {
-            showAddTaskWindow = true;
+            taskManager.setCommand(std::make_unique<addCommand>(db, "refresh database", "2025-04-10"));
+            taskManager.executeCommand();
+            std::cout << "task was added!" << std::endl;
+            // refresh view
+            tasks = showTasksPreview(db);
         }
         ImGui::Separator();
 
@@ -240,6 +244,7 @@ int main() {
     }
 
     // cleanup
+    sqlite3_close(db);
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL3_Shutdown();
     ImGui::DestroyContext();
