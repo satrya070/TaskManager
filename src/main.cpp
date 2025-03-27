@@ -78,6 +78,15 @@ static std::vector<Task> showTasksPreview(sqlite3* db) {
     return tasks;
 }
 
+bool showAddTaskWindow = false;
+void addTaskWindow() {
+    if (showAddTaskWindow) {
+        ImGui::Begin("Add task", &showAddTaskWindow);
+        ImGui::Button("add task");
+        ImGui::End();
+    }
+}
+
 
 int main() {
     sqlite3* db;
@@ -97,10 +106,6 @@ int main() {
     for (const Task& task : tasks) {
         std::cout << task.getTaskName() << std::endl;
     }
-
-    int input;
-    //std::cin >> choice;
-    input = 0;
 
     Manager taskManager;
 
@@ -175,10 +180,11 @@ int main() {
         // GUI
         ImGui::Begin("Task Manager", nullptr, window_flags);
 
-        ImGui::TextWrapped("asdfsafasdfdasfdsaf");
-        static char buff[32];
-        ImGui::InputText("default", buff, 32);
-        ImGui::BulletText("bullet 1");
+        static char buff[200];
+        ImGui::InputText("default", buff, 200);
+        ImGui::SameLine();
+        static char buff2[32];
+        ImGui::InputText("default##2", buff2, 32);
 
         static int clicked = 0;
         if (ImGui::Button("Delete task")) {
@@ -188,6 +194,9 @@ int main() {
         if (clicked) {
             ImGui::SameLine();
             ImGui::Text("Thanks for clicking me!");
+        }
+        if (ImGui::Button("add task")) {
+            showAddTaskWindow = true;
         }
         ImGui::Separator();
 
@@ -213,9 +222,10 @@ int main() {
             ImGui::Begin("archive", &showArchiveWindow);
             ImGui::Text("asdf");
             ImGui::End();
-
-            //if(ImGui::Button("Close"))
         }
+
+        // add task
+        addTaskWindow();
 
         // DEMO
         // ImGui::ShowDemoWindow();
