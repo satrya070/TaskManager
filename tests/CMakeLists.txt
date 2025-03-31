@@ -9,7 +9,8 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
-add_executable(test_task_manager test_task_manager.cpp)
+add_executable(test_task_manager test_task_manager.cpp test_task.cpp)
+target_include_directories(test_task_manager PRIVATE ${CMAKE_SOURCE_DIR}/include)
 target_link_libraries(test_task_manager PRIVATE GTest::gtest_main)
 
 enable_testing()
