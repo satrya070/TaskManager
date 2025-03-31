@@ -42,7 +42,7 @@ bool initTables(sqlite3* db, const std::string& filePath) {
 }
 
 static std::vector<Task> showTasksPreview(sqlite3* db) {
-    std::string selectQuery = "SELECT name, deadline, done FROM tasks;";
+    std::string selectQuery = "SELECT id, name, deadline FROM tasks;";
 
     sqlite3_stmt* stmt;
     if (sqlite3_prepare_v2(db, selectQuery.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
@@ -51,26 +51,32 @@ static std::vector<Task> showTasksPreview(sqlite3* db) {
 
     std::vector<Task> tasks;
     while (sqlite3_step(stmt) == SQLITE_ROW) {
+        unsigned int task_id;
         std::string task_name;
+        std::string deadline;
 
         const unsigned char* text;
+        // loop through the columns of this row
         for (int i = 0; i < 3; i++) {
             int columnType = sqlite3_column_type(stmt, i);
 
             switch (columnType) {
             case SQLITE_TEXT:
                 text = sqlite3_column_text(stmt, i);
-                task_name = text ? reinterpret_cast<const char*>(text) : "";
-                std::cout << task_name << " | ";
+                if (strcmp(sqlite3_column_name(stmt, i), "name") == 0) {
+                    task_name = text ? reinterpret_cast<const char*>(text) : "";
+                    //std::cout << task_name << std::endl;
+                } 
+                else {
+                    deadline = text ? reinterpret_cast<const char*>(text) : "";
+                }
                 break;
             case SQLITE_INTEGER:
-                std::cout << sqlite3_column_int(stmt, i) << " | ";
+                task_id = sqlite3_column_int(stmt, i);
                 break;
             }
         }
-        tasks.emplace_back(task_name);
-        //tasks.push_back(std::make_unique<Task>(task_name));
-        std::cout << std::endl;
+        tasks.emplace_back(task_id, task_name);
     }
     sqlite3_finalize(stmt);
 
@@ -102,9 +108,9 @@ int main() {
     // always the show the first 5 tasks
     std::vector<Task> tasks = showTasksPreview(db);
     std::cout << tasks.size() << std::endl;
-    for (const Task& task : tasks) {
-        std::cout << task.getTaskName() << std::endl;
-    }
+    /*for (const Task& task : tasks) {
+        std::cout << task.getTaskId() << ": " << task.getTaskName() << std::endl;
+    }*/
 
     Manager taskManager;
 
@@ -212,8 +218,11 @@ int main() {
 
         for (const Task& task : tasks) {
             ImGui::TableNextRow();
-            ImGui::TableSetColumnIndex(0); ImGui::Text("Task name");
+            ImGui::TableSetColumnIndex(0); ImGui::Text(task.getTaskName().c_str());
             ImGui::TableSetColumnIndex(1); ImGui::Text(task.getTaskName().c_str());
+            ImGui::PushID(task.getTaskId());
+            ImGui::TableSetColumnIndex(2); ImGui::Button("done");
+            ImGui::PopID();
         }
 
         ImGui::EndTable();

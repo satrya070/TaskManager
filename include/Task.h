@@ -3,12 +3,16 @@
 
 class Task {
 public:
-	Task(std::string _task_name) : task_name(_task_name) {}
+	Task(unsigned int _task_id, std::string _task_name) : task_id(_task_id), task_name(_task_name) {}
 
-	// TODO check
+	const unsigned int& getTaskId() const {
+		return task_id;
+	}
+
 	const std::string& getTaskName() const {
 		return task_name;
 	}
 private:
+	unsigned int task_id;
 	std::string task_name;
 };
