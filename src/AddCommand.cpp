@@ -1,6 +1,5 @@
 #include "Command.h"
 
-
 AddCommand::AddCommand(sqlite3* db, std::string taskName, std::string deadline) :
     db(db), taskName(taskName), deadline(deadline) {}
 

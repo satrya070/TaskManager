@@ -25,9 +25,6 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(imgui)
 
-# add googletest tests
-add_subdirectory(tests)
-
 # create imgui library target
 add_library(imgui_lib STATIC
     ${imgui_SOURCE_DIR}/imgui.cpp
@@ -54,6 +51,9 @@ add_executable(TaskManager src/main.cpp ${SOURCES})
 # include headers
 target_include_directories(TaskManager PRIVATE include/ external/sqlite/include)
 target_link_libraries(TaskManager PRIVATE sqlite3 imgui_lib SDL3::SDL3 OpenGL::GL)
+
+# add googletest tests
+add_subdirectory(tests)
 
 # post build commands
 add_custom_command(TARGET TaskManager COMMAND ${CMAKE_COMMAND} -E copy_if_different
