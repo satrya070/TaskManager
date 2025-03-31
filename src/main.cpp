@@ -6,7 +6,6 @@
 #include <format>
 #include "Manager.h"
 #include "Command.h"
-#include "Command.cpp"
 #include "Task.h"
 #include <fstream>
 #include <sstream>
@@ -196,7 +195,7 @@ int main() {
             ImGui::Text("Thanks for clicking me!");
         }
         if (ImGui::Button("add task")) {
-            taskManager.setCommand(std::make_unique<addCommand>(db, "refresh database", "2025-04-10"));
+            taskManager.setCommand(std::make_unique<AddCommand>(db, "refresh database", "2025-04-10"));
             taskManager.executeCommand();
             std::cout << "task was added!" << std::endl;
             // refresh view

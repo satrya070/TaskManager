@@ -3,7 +3,7 @@
 
 class Task {
 public:
-	Task(std::string _task_name);
+	Task(std::string _task_name) : task_name(_task_name) {}
 
 	// TODO check
 	const std::string& getTaskName() const {
