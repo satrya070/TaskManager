@@ -111,19 +111,6 @@ int main() {
 
     Manager taskManager;
 
-    // TODO ---- refactor to gui
-
-    // set and execute command
-    //taskManager.setCommand(std::make_unique<addCommand>(db, "buy eggs", "2025-06-14"));
-    //taskManager.executeCommand();
-
-    // delete command
-    //taskManager.setCommand(std::make_unique<deleteCommand>(db, 10));
-    //taskManager.executeCommand();
-
-    // TODO
-    //update command
-
 
     //----- GUI -----------------------------
 
@@ -218,8 +205,12 @@ int main() {
             ImGui::TableSetColumnIndex(1); ImGui::Text(task.getTaskName().c_str());
             ImGui::PushID(task.getTaskId());
             ImGui::TableSetColumnIndex(2);
-            if (ImGui::Button("done"))
-                std::cout << task.getTaskId() << std::endl;
+            if (ImGui::Button("done")) {
+                taskManager.setCommand(std::make_unique<ArchiveCommand>(
+                    db, task.getTaskId(), task.getTaskName(), "0000-00-00"
+                ));
+                taskManager.executeCommand();
+            }
             ImGui::PopID();
         }
 

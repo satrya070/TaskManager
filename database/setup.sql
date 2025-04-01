@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS tasks (
 CREATE TABLE IF NOT EXISTS tasks_archive (
 	id INTEGER PRIMARY KEY,
 	name varchar(255) NOT NULL,
-	finish_data DATE
+	finish_date DATE
 );
 
 -- some example tasks
