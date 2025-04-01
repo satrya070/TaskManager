@@ -16,8 +16,6 @@ add_executable(test_task_manager
     test_add_command.cpp
 )
 
-#file(GLOB SOURCES ${CMAKE_SOURCE_DIR}/src/AddCommand.cpp)
-
 target_include_directories(test_task_manager PRIVATE ${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/external/sqlite/include)
 target_link_libraries(test_task_manager PRIVATE GTest::gtest_main sqlite3)
 

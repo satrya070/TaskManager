@@ -108,9 +108,6 @@ int main() {
     // always the show the first 5 tasks
     std::vector<Task> tasks = showTasksPreview(db);
     std::cout << tasks.size() << std::endl;
-    /*for (const Task& task : tasks) {
-        std::cout << task.getTaskId() << ": " << task.getTaskName() << std::endl;
-    }*/
 
     Manager taskManager;
 
@@ -156,7 +153,7 @@ int main() {
     ImGui_ImplOpenGL3_Init("#version 330");
 
     // initial window status
-    bool showArchiveWindow = false;
+    bool showArchiveWindow = true;
 
     bool running = true;
     while (running) {
@@ -213,7 +210,6 @@ int main() {
         ImGui::BeginTable("table", 3, tableFlags);
         ImGui::TableSetupColumn("Task", ImGuiTableColumnFlags_WidthFixed, 200.f); // , ImGuiTableColumnFlags_WidthFixed);
         ImGui::TableSetupColumn("date", ImGuiTableColumnFlags_WidthFixed, 100.f);
-        ImGui::TableSetupColumn("done", ImGuiTableColumnFlags_WidthFixed, 100.f);
         ImGui::TableHeadersRow();
 
         for (const Task& task : tasks) {
@@ -221,7 +217,9 @@ int main() {
             ImGui::TableSetColumnIndex(0); ImGui::Text(task.getTaskName().c_str());
             ImGui::TableSetColumnIndex(1); ImGui::Text(task.getTaskName().c_str());
             ImGui::PushID(task.getTaskId());
-            ImGui::TableSetColumnIndex(2); ImGui::Button("done");
+            ImGui::TableSetColumnIndex(2);
+            if (ImGui::Button("done"))
+                std::cout << task.getTaskId() << std::endl;
             ImGui::PopID();
         }
 

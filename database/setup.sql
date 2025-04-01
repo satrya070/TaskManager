@@ -5,6 +5,12 @@ CREATE TABLE IF NOT EXISTS tasks (
 	done BOOLEAN DEFAULT false
 );
 
+CREATE TABLE IF NOT EXISTS tasks_archive (
+	id INTEGER PRIMARY KEY,
+	name varchar(255) NOT NULL,
+	finish_data DATE
+);
+
 -- some example tasks
 /*INSERT INTO tasks (name, deadline)
 VALUES
