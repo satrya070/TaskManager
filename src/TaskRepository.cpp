@@ -9,13 +9,17 @@ void TaskRepository::addTask(std::string taskName, std::string deadlineDate) {
 	db.insertQuery(insertQuery);
 }
 
-/*void TaskRepository::archiveTask(int taskId, std::string taskName, std::string deadlineDate) {
-	std::string insertQuery = "";
-	db.executeQuery(insertQuery);
+void TaskRepository::archiveTask(int taskId, std::string taskName, std::string deadlineDate) {
+	std::string insertQuery = std::format(
+		"INSERT INTO tasks_archive(id, name, finish_date) VALUES ({}, '{}', '{}')",
+		taskId, taskName, deadlineDate
+	);
+	db.insertQuery(insertQuery);
 
 	// delete from current tasks table
-	TaskRepository::deleteTask(taskId);
-}*/
+	std::string deleteQuery = std::format("DELETE FROM tasks WHERE id = {}", taskId);
+	db.deleteQuery(deleteQuery);
+}
 
 void TaskRepository::deleteTask(int taskId) {
 	std::string query = std::format("DELETE FROM tasks_archive WHERE id = {};", taskId);

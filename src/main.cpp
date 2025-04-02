@@ -128,10 +128,17 @@ int main() {
             ImGui::PushID(task.getTaskId());
             ImGui::TableSetColumnIndex(2);
             if (ImGui::Button("done")) {
-                /*taskManager.setCommand(std::make_unique<ArchiveCommand>(
-                    db, task.getTaskId(), task.getTaskName(), "0000-00-00"
-                ));
-                taskManager.executeCommand();*/
+                taskManager.taskRepository.archiveTask(
+                    task.getTaskId(), task.getTaskName(), task.getDeadlineDate()
+                );
+
+                //refresh views
+                tasks = taskManager.taskRepository.fetchTasks();
+                archived_tasks = taskManager.taskRepository.fetchArchivedTasks();
+
+                //abort the current loop with old version of tasks
+                ImGui::PopID();
+                break;
             }
             ImGui::PopID();
         }
@@ -161,6 +168,10 @@ int main() {
                     taskManager.taskRepository.deleteTask(task.getTaskId());
                     // refresh archive view
                     archived_tasks = taskManager.taskRepository.fetchArchivedTasks();
+
+                    //abort the current loop with old version of tasks
+                    ImGui::PopID();
+                    break;
                 }
                 ImGui::PopID();
             }
