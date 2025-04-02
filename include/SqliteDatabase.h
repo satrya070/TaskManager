@@ -7,7 +7,7 @@ public:
     SqliteDatabase(const std::string& databaseFile);
     ~SqliteDatabase() = default;
 
-    void executeQuery(const std::string& query) override;
+    void executeQuery(const std::string& query, std::function<void(sqlite3_stmt*)> callback) override;
 
 private:
     sqlite3* db;

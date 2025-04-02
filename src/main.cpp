@@ -137,7 +137,7 @@ void addTaskWindow() {
 
 
 int main() {
-    sqlite3* db;
+    /*sqlite3* db;
     int returnCode = sqlite3_open_v2(
         "tasks_database.db", &db, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, nullptr
     );
@@ -147,14 +147,19 @@ int main() {
     }
 
     initTables(db, "setup.sql");
+    
 
     // always the show the first 5 tasks
     std::vector<Task> tasks = showTasksPreview(db);
     std::cout << tasks.size() << std::endl;
+    */
 
     SqliteDatabase taskRepositoryDB("tasks_database.db");
     TaskRepository taskRepository(taskRepositoryDB);
-    Manager taskManager();
+    Manager taskManager(taskRepository);
+
+    std::vector<Task> tasks = taskManager.taskRepository.fetchTasks();
+    
 
 
     //----- GUI -----------------------------
@@ -235,7 +240,7 @@ int main() {
             taskManager.executeCommand();*/
             std::cout << "task was added!" << std::endl;
             // refresh view
-            tasks = showTasksPreview(db);
+            //tasks = showTasksPreview(db);
         }
         ImGui::Separator();
 
@@ -290,7 +295,7 @@ int main() {
     }
 
     // cleanup
-    sqlite3_close(db);
+    //sqlite3_close(db);
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL3_Shutdown();
     ImGui::DestroyContext();

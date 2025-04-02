@@ -5,11 +5,11 @@
 
 class Manager {
 public:
-	Manager(TaskRepository taskRepository) : taskRepository(taskRepository) {}
+	Manager(TaskRepository& taskRepository) : taskRepository(taskRepository) {}
 	void setCommand(std::unique_ptr<Command>&& _command);
 	void executeCommand();
 
+	TaskRepository taskRepository;
 private:
 	std::unique_ptr<Command> command;
-	TaskRepository taskRepository;
 };
