@@ -13,7 +13,7 @@ public:
 	//void deleteTask(int taskId);
 
 	std::vector<Task> fetchTasks();
-	void fetchArchivedTasks();
+	std::vector<Task> fetchArchivedTasks();
 
 private:
 	IDatabase& db;

@@ -34,6 +34,7 @@ int main() {
     Manager taskManager(taskRepository);
 
     std::vector<Task> tasks = taskManager.taskRepository.fetchTasks();
+    std::vector<Task> archived_tasks = taskManager.taskRepository.fetchArchivedTasks();
     
     //----- GUI -----------------------------
     if (!SDL_Init(SDL_INIT_VIDEO)) {
@@ -123,7 +124,7 @@ int main() {
         for (const Task& task : tasks) {
             ImGui::TableNextRow();
             ImGui::TableSetColumnIndex(0); ImGui::Text(task.getTaskName().c_str());
-            ImGui::TableSetColumnIndex(1); ImGui::Text(task.getTaskName().c_str());
+            ImGui::TableSetColumnIndex(1); ImGui::Text(task.getDeadlineDate().c_str());
             ImGui::PushID(task.getTaskId());
             ImGui::TableSetColumnIndex(2);
             if (ImGui::Button("done")) {
@@ -145,15 +146,15 @@ int main() {
         // archived window
         if (showArchiveWindow) {
             ImGui::Begin("archive", &showArchiveWindow);
-            ImGui::Text("asdf");
+            
+            for (const auto& task : archived_tasks) {
+                ImGui::Text(task.getTaskName().c_str());
+            }
             ImGui::End();
         }
 
         // add task
         addTaskWindow();
-
-        // DEMO
-        // ImGui::ShowDemoWindow();
 
         // render
         ImGui::Render();
@@ -165,7 +166,6 @@ int main() {
     }
 
     // cleanup
-    //sqlite3_close(db);
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL3_Shutdown();
     ImGui::DestroyContext();
