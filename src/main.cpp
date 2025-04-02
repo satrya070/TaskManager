@@ -83,6 +83,48 @@ static std::vector<Task> showTasksPreview(sqlite3* db) {
     return tasks;
 }
 
+static std::vector<Task> fetchArchivedTasks(sqlite3* db) {
+    std::string selectQuery = "SELECT id, name, finish_date FROM tasks_archive;";
+
+    sqlite3_stmt* stmt;
+    if (sqlite3_prepare_v2(db, selectQuery.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
+        std::cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << std::endl;
+    }
+
+    std::vector<Task> tasks;
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        unsigned int task_id;
+        std::string task_name;
+        std::string deadline;
+
+        const unsigned char* text;
+        // loop through the columns of this row
+        for (int i = 0; i < 3; i++) {
+            int columnType = sqlite3_column_type(stmt, i);
+
+            switch (columnType) {
+            case SQLITE_TEXT:
+                text = sqlite3_column_text(stmt, i);
+                if (strcmp(sqlite3_column_name(stmt, i), "name") == 0) {
+                    task_name = text ? reinterpret_cast<const char*>(text) : "";
+                    //std::cout << task_name << std::endl;
+                }
+                else {
+                    deadline = text ? reinterpret_cast<const char*>(text) : "";
+                }
+                break;
+            case SQLITE_INTEGER:
+                task_id = sqlite3_column_int(stmt, i);
+                break;
+            }
+        }
+        tasks.emplace_back(task_id, task_name);
+    }
+    sqlite3_finalize(stmt);
+
+    return tasks;
+}
+
 bool showAddTaskWindow = false;
 void addTaskWindow() {
     if (showAddTaskWindow) {
@@ -140,7 +182,7 @@ int main() {
     ImGui_ImplOpenGL3_Init("#version 330");
 
     // initial window status
-    bool showArchiveWindow = true;
+    bool showArchiveWindow = false;
 
     bool running = true;
     while (running) {
@@ -185,6 +227,7 @@ int main() {
             ImGui::Text("Thanks for clicking me!");
         }
         if (ImGui::Button("add task")) {
+            // TODO implement real add
             taskManager.setCommand(std::make_unique<AddCommand>(db, "refresh database", "2025-04-10"));
             taskManager.executeCommand();
             std::cout << "task was added!" << std::endl;
@@ -215,6 +258,9 @@ int main() {
         }
 
         ImGui::EndTable();
+
+        if (ImGui::Button("Tasks archive"))
+            showArchiveWindow = true;
 
         ImGui::End();
 
