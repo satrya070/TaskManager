@@ -18,114 +18,6 @@
 #include "SDL3/SDL_opengl.h"
 
 
-bool initTables(sqlite3* db, const std::string& filePath) {
-    // creates the database tables if they don't exist yet
-    std::ifstream file(filePath);
-    if (!file) {
-        std::cerr << "Error: file doesn't exist." << std::endl;
-        return false;
-    }
-
-    // read content into string buffer
-    std::stringstream buffer;
-    buffer << file.rdbuf();
-    std::string sql = buffer.str();
-
-    // execute sql
-    char* errorMessage = nullptr;
-    if (sqlite3_exec(db, sql.c_str(), nullptr, nullptr, &errorMessage) != SQLITE_OK) {
-        std::cerr << "Failed to create tables with: " << filePath << std::endl;
-        sqlite3_free(errorMessage);
-        return false;
-    }
-
-    return true;
-}
-
-static std::vector<Task> showTasksPreview(sqlite3* db) {
-    std::string selectQuery = "SELECT id, name, deadline FROM tasks;";
-
-    sqlite3_stmt* stmt;
-    if (sqlite3_prepare_v2(db, selectQuery.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
-        std::cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << std::endl;
-    }
-
-    std::vector<Task> tasks;
-    while (sqlite3_step(stmt) == SQLITE_ROW) {
-        unsigned int task_id;
-        std::string task_name;
-        std::string deadline;
-
-        const unsigned char* text;
-        // loop through the columns of this row
-        for (int i = 0; i < 3; i++) {
-            int columnType = sqlite3_column_type(stmt, i);
-
-            switch (columnType) {
-            case SQLITE_TEXT:
-                text = sqlite3_column_text(stmt, i);
-                if (strcmp(sqlite3_column_name(stmt, i), "name") == 0) {
-                    task_name = text ? reinterpret_cast<const char*>(text) : "";
-                    //std::cout << task_name << std::endl;
-                } 
-                else {
-                    deadline = text ? reinterpret_cast<const char*>(text) : "";
-                }
-                break;
-            case SQLITE_INTEGER:
-                task_id = sqlite3_column_int(stmt, i);
-                break;
-            }
-        }
-        tasks.emplace_back(task_id, task_name);
-    }
-    sqlite3_finalize(stmt);
-
-    return tasks;
-}
-
-static std::vector<Task> fetchArchivedTasks(sqlite3* db) {
-    std::string selectQuery = "SELECT id, name, finish_date FROM tasks_archive;";
-
-    sqlite3_stmt* stmt;
-    if (sqlite3_prepare_v2(db, selectQuery.c_str(), -1, &stmt, nullptr) != SQLITE_OK) {
-        std::cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << std::endl;
-    }
-
-    std::vector<Task> tasks;
-    while (sqlite3_step(stmt) == SQLITE_ROW) {
-        unsigned int task_id;
-        std::string task_name;
-        std::string deadline;
-
-        const unsigned char* text;
-        // loop through the columns of this row
-        for (int i = 0; i < 3; i++) {
-            int columnType = sqlite3_column_type(stmt, i);
-
-            switch (columnType) {
-            case SQLITE_TEXT:
-                text = sqlite3_column_text(stmt, i);
-                if (strcmp(sqlite3_column_name(stmt, i), "name") == 0) {
-                    task_name = text ? reinterpret_cast<const char*>(text) : "";
-                    //std::cout << task_name << std::endl;
-                }
-                else {
-                    deadline = text ? reinterpret_cast<const char*>(text) : "";
-                }
-                break;
-            case SQLITE_INTEGER:
-                task_id = sqlite3_column_int(stmt, i);
-                break;
-            }
-        }
-        tasks.emplace_back(task_id, task_name);
-    }
-    sqlite3_finalize(stmt);
-
-    return tasks;
-}
-
 bool showAddTaskWindow = false;
 void addTaskWindow() {
     if (showAddTaskWindow) {
@@ -137,33 +29,13 @@ void addTaskWindow() {
 
 
 int main() {
-    /*sqlite3* db;
-    int returnCode = sqlite3_open_v2(
-        "tasks_database.db", &db, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, nullptr
-    );
-    if (returnCode != SQLITE_OK) {
-        std::cout << returnCode << ": Failed to open DB: " << sqlite3_errmsg(db) << std::endl;
-        return 1;
-    }
-
-    initTables(db, "setup.sql");
-    
-
-    // always the show the first 5 tasks
-    std::vector<Task> tasks = showTasksPreview(db);
-    std::cout << tasks.size() << std::endl;
-    */
-
     SqliteDatabase taskRepositoryDB("tasks_database.db");
     TaskRepository taskRepository(taskRepositoryDB);
     Manager taskManager(taskRepository);
 
     std::vector<Task> tasks = taskManager.taskRepository.fetchTasks();
     
-
-
     //----- GUI -----------------------------
-
     if (!SDL_Init(SDL_INIT_VIDEO)) {
         SDL_Log("Failed to initialize SDL: %s", SDL_GetError());
         return -1;

@@ -25,7 +25,7 @@ std::vector<Task> TaskRepository::fetchTasks() {
 	std::vector<Task> tasks;
 	std::string selectQuery = "SELECT id, name, deadline FROM tasks;";
 
-	db.executeQuery(selectQuery, [&](sqlite3_stmt* stmt) {
+	db.selectQuery(selectQuery, [&](sqlite3_stmt* stmt) {
 		int id = sqlite3_column_int(stmt, 0);
 		std::string name(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1)));
 		std::string deadline(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2)));
