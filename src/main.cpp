@@ -135,7 +135,6 @@ int main() {
             }
             ImGui::PopID();
         }
-
         ImGui::EndTable();
 
         if (ImGui::Button("Tasks archive"))
@@ -147,9 +146,26 @@ int main() {
         if (showArchiveWindow) {
             ImGui::Begin("archive", &showArchiveWindow);
             
+            ImGui::BeginTable("asdf", 3, tableFlags);
+            ImGui::TableSetupColumn("Task", ImGuiTableColumnFlags_WidthFixed, 200.f);
+            ImGui::TableSetupColumn("dateFinished", ImGuiTableColumnFlags_WidthFixed, 200.f);
+            ImGui::TableHeadersRow();
+            
             for (const auto& task : archived_tasks) {
-                ImGui::Text(task.getTaskName().c_str());
+                ImGui::TableNextRow();
+                ImGui::TableSetColumnIndex(0); ImGui::Text(task.getTaskName().c_str());
+                ImGui::TableSetColumnIndex(1); ImGui::Text(task.getDeadlineDate().c_str());
+                ImGui::TableSetColumnIndex(2);
+                ImGui::PushID(task.getTaskId());
+                if (ImGui::Button("Delete")) {
+                    taskManager.taskRepository.deleteTask(task.getTaskId());
+                    // refresh archive view
+                    archived_tasks = taskManager.taskRepository.fetchArchivedTasks();
+                }
+                ImGui::PopID();
             }
+            ImGui::EndTable();
+
             ImGui::End();
         }
 

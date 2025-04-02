@@ -15,12 +15,12 @@ void TaskRepository::addTask(std::string taskName, std::string deadlineDate) {
 
 	// delete from current tasks table
 	TaskRepository::deleteTask(taskId);
-}
+}*/
 
 void TaskRepository::deleteTask(int taskId) {
-	std::string deleteQuery = "";
-	db.executeQuery(deleteQuery);
-}*/
+	std::string query = std::format("DELETE FROM tasks_archive WHERE id = {};", taskId);
+	db.deleteQuery(query);
+}
 
 std::vector<Task> TaskRepository::fetchTasks() {
 	std::vector<Task> tasks;
