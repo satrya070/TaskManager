@@ -9,6 +9,7 @@
 #include "Task.h"
 #include <fstream>
 #include <sstream>
+#include "SqliteDatabase.h"
 
 #include "imgui.h"
 #include "imgui_impl_sdl3.h"
@@ -151,7 +152,9 @@ int main() {
     std::vector<Task> tasks = showTasksPreview(db);
     std::cout << tasks.size() << std::endl;
 
-    Manager taskManager;
+    SqliteDatabase taskRepositoryDB("tasks_database.db");
+    TaskRepository taskRepository(taskRepositoryDB);
+    Manager taskManager();
 
 
     //----- GUI -----------------------------
@@ -228,8 +231,8 @@ int main() {
         }
         if (ImGui::Button("add task")) {
             // TODO implement real add
-            taskManager.setCommand(std::make_unique<AddCommand>(db, "refresh database", "2025-04-10"));
-            taskManager.executeCommand();
+            /*taskManager.setCommand(std::make_unique<AddCommand>(db, "refresh database", "2025-04-10"));
+            taskManager.executeCommand();*/
             std::cout << "task was added!" << std::endl;
             // refresh view
             tasks = showTasksPreview(db);
@@ -249,10 +252,10 @@ int main() {
             ImGui::PushID(task.getTaskId());
             ImGui::TableSetColumnIndex(2);
             if (ImGui::Button("done")) {
-                taskManager.setCommand(std::make_unique<ArchiveCommand>(
+                /*taskManager.setCommand(std::make_unique<ArchiveCommand>(
                     db, task.getTaskId(), task.getTaskName(), "0000-00-00"
                 ));
-                taskManager.executeCommand();
+                taskManager.executeCommand();*/
             }
             ImGui::PopID();
         }

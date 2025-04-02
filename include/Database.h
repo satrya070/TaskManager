@@ -1,7 +1,8 @@
 #pragma once
+#include <string>
 
 class IDatabase {
 public:
 	// can be extended in specific CRUD operations
-	virtual void executeQuery(std::string query) = 0;
+	virtual void executeQuery(const std::string& query) = 0;
 };

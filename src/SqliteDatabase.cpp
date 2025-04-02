@@ -1,7 +1,37 @@
-#include "Database.h"
+#include "SqliteDatabase.h"
 #include "sqlite3.h"
+#include <iostream>
+#include <fstream>
+#include <sstream>
 
-static bool initTables(sqlite3* db, const std::string& filePath) {
+SqliteDatabase::SqliteDatabase(const std::string& databaseFile) {
+
+    if (SqliteDatabase::createConn(databaseFile) != 0) {
+        std::cout << "Error opening database" << std::endl;
+    }
+
+    if (!SqliteDatabase::initTables(db, "setup.sql")) {
+        std::cout << "Failed to initialise tables" << std::endl;
+    }
+}
+
+int SqliteDatabase::createConn(const std::string& databaseFile) {
+    int returnCode = sqlite3_open_v2(
+        databaseFile.c_str(), &db, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, nullptr
+    );
+    if (returnCode != SQLITE_OK) {
+        std::cout << returnCode << ": Failed to open DB: " << sqlite3_errmsg(db) << std::endl;
+        return 1;
+    }
+
+    return 0;
+}
+
+void SqliteDatabase::executeQuery(const std::string& query) {
+    std::cout << "execute query" << std::endl;
+}
+
+bool SqliteDatabase::initTables(sqlite3* db, const std::string& filePath) {
     // creates the database tables if they don't exist yet
     std::ifstream file(filePath);
     if (!file) {
@@ -24,26 +54,3 @@ static bool initTables(sqlite3* db, const std::string& filePath) {
 
     return true;
 }
-
-
-class SqliteDatabase : public IDatabase {
-public:
-	SqliteDatabase(std::string databaseFile) {
-        int returnCode = sqlite3_open_v2(
-            "tasks_database.db", &db, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, nullptr
-        );
-        if (returnCode != SQLITE_OK) {
-            std::cout << returnCode << ": Failed to open DB: " << sqlite3_errmsg(db) << std::endl;
-            return 1;
-        }
-
-        initTables(db, "setup.sql");
-	}
-
-	void executeQuery(std::string query) override {
-
-	}
-
-private:
-	sqlite3* db;
-};
