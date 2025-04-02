@@ -1,14 +1,15 @@
 #include "TaskRepository.h"
 #include <functional>
+#include <format>
 
 TaskRepository::TaskRepository(IDatabase& db) : db(db) {}
 
-/*void TaskRepository::addTask(std::string taskName, std::string deadlineDate) {
-	std::string insertQuery = "";
-	db.executeQuery(insertQuery);
+void TaskRepository::addTask(std::string taskName, std::string deadlineDate) {
+	std::string insertQuery = std::format("INSERT INTO tasks(name, deadline) VALUES ('{}', '{}')", taskName, deadlineDate);
+	db.insertQuery(insertQuery);
 }
 
-void TaskRepository::archiveTask(int taskId, std::string taskName, std::string deadlineDate) {
+/*void TaskRepository::archiveTask(int taskId, std::string taskName, std::string deadlineDate) {
 	std::string insertQuery = "";
 	db.executeQuery(insertQuery);
 

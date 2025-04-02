@@ -8,7 +8,8 @@ public:
     ~SqliteDatabase() = default;
 
     void selectQuery(const std::string& query, std::function<void(sqlite3_stmt*)> callback) override;
-    // deleteQuery
+    void insertQuery(const std::string& query) override;
+    void deleteQuery(const std::string& query) override;
 private:
     sqlite3* db;
     int createConn(const std::string& databaseFile);

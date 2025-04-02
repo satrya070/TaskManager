@@ -40,6 +40,28 @@ void SqliteDatabase::selectQuery(const std::string& query, std::function<void(sq
     sqlite3_finalize(stmt);
 }
 
+void SqliteDatabase::insertQuery(const std::string& query) {
+    char* errorMessage;
+    int resultCode = sqlite3_exec(db, query.c_str(), nullptr, nullptr, &errorMessage);
+    if (resultCode != SQLITE_OK) {
+        // TODO handle except properly
+        std::cout << resultCode << ": " << errorMessage << std::endl;
+        return;
+    }
+    return;
+}
+
+void SqliteDatabase::deleteQuery(const std::string& query) {
+    char* errorMessage;
+    int resultCode = sqlite3_exec(db, query.c_str(), nullptr, nullptr, &errorMessage);
+    if (resultCode != SQLITE_OK) {
+        // TODO handle except properly
+        std::cout << resultCode << ": " << errorMessage << std::endl;
+        return;
+    }
+    return;
+}
+
 bool SqliteDatabase::initTables(sqlite3* db, const std::string& filePath) {
     // creates the database tables if they don't exist yet
     std::ifstream file(filePath);

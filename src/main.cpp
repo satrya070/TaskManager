@@ -107,12 +107,10 @@ int main() {
             ImGui::Text("Thanks for clicking me!");
         }
         if (ImGui::Button("add task")) {
-            // TODO implement real add
-            /*taskManager.setCommand(std::make_unique<AddCommand>(db, "refresh database", "2025-04-10"));
-            taskManager.executeCommand();*/
-            std::cout << "task was added!" << std::endl;
-            // refresh view
-            //tasks = showTasksPreview(db);
+            // TODO implement GUI add fields
+            taskManager.taskRepository.addTask("update README", "2025-04-10");
+            // refresh tasks view
+            tasks = taskManager.taskRepository.fetchTasks();
         }
         ImGui::Separator();
 
