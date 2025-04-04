@@ -1,11 +1,19 @@
 #include "TaskRepository.h"
 #include <functional>
 #include <format>
+#include <chrono>
 
 TaskRepository::TaskRepository(IDatabase& db) : db(db) {}
 
 void TaskRepository::addTask(std::string taskName, std::string deadlineDate) {
-	std::string insertQuery = std::format("INSERT INTO tasks(name, deadline) VALUES ('{}', '{}')", taskName, deadlineDate);
+	// generate the date of creation
+	auto now = std::chrono::system_clock::now();
+	std::chrono::year_month_day date = std::chrono::floor<std::chrono::days>(now);
+	std::string createDate = std::format("{:%F}", date);
+
+	std::string insertQuery = std::format(
+		"INSERT INTO tasks(name, created, deadline) VALUES ('{}', '{}', '{}')",
+		taskName, createDate, deadlineDate);
 	db.insertQuery(insertQuery);
 }
 

@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS tasks (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	name varchar(255) NOT NULL,
+	created DATE,
 	deadline DATE,
 	done BOOLEAN DEFAULT false
 );
