@@ -136,17 +136,19 @@ int main() {
         ImGui::Spacing();
 
         ImGuiTableFlags tableFlags = ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable;
-        ImGui::BeginTable("table", 3, tableFlags);
+        ImGui::BeginTable("table", 4, tableFlags);
         ImGui::TableSetupColumn("Task", ImGuiTableColumnFlags_WidthFixed, 200.f); // , ImGuiTableColumnFlags_WidthFixed);
-        ImGui::TableSetupColumn("date", ImGuiTableColumnFlags_WidthFixed, 100.f);
+        ImGui::TableSetupColumn("Created", ImGuiTableColumnFlags_WidthFixed, 100.f);
+        ImGui::TableSetupColumn("Deadline", ImGuiTableColumnFlags_WidthFixed, 100.f);
         ImGui::TableHeadersRow();
 
         for (const Task& task : tasks) {
             ImGui::TableNextRow();
             ImGui::TableSetColumnIndex(0); ImGui::Text(task.getTaskName().c_str());
-            ImGui::TableSetColumnIndex(1); ImGui::Text(task.getDeadlineDate().c_str());
+            ImGui::TableSetColumnIndex(1); ImGui::Text(task.getCreateDate().c_str());
+            ImGui::TableSetColumnIndex(2); ImGui::Text(task.getDeadlineDate().c_str());
             ImGui::PushID(task.getTaskId());
-            ImGui::TableSetColumnIndex(2);
+            ImGui::TableSetColumnIndex(3);
             if (ImGui::Button("done")) {
                 taskManager.taskRepository.archiveTask(
                     task.getTaskId(), task.getTaskName(), task.getDeadlineDate()
