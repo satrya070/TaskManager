@@ -52,6 +52,9 @@ add_executable(TaskManager src/main.cpp ${SOURCES})
 target_include_directories(TaskManager PRIVATE include/ external/sqlite/include)
 target_link_libraries(TaskManager PRIVATE sqlite3 imgui_lib SDL3::SDL3 OpenGL::GL)
 
+# add googletest tests
+add_subdirectory(tests)
+
 # post build commands
 add_custom_command(TARGET TaskManager COMMAND ${CMAKE_COMMAND} -E copy_if_different
     $<TARGET_RUNTIME_DLLS:TaskManager>
