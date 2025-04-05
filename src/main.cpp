@@ -95,15 +95,23 @@ int main() {
         static char buffName[256];
         static char buffDeadline[11];
 
-        // TODO implement GUI add fields
-        //ImGui::SameLine();
-        /*if (buffName[0] == '\0') {
-            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.5f, 0.5f, 0.5f, 1.0f)); // Gray text
-            ImGui::TextUnformatted("Enter task name...");
-            ImGui::PopStyleColor();
-            ImGui::SetItemAllowOverlap(); // So input appears over this
-        }*/
+        //
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.5f, 0.5f, 0.5f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));           // transparent background
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0, 0, 0, 0));    // no hover color
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0, 0, 0, 0));     // no click color
+        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
         float windowWidth = ImGui::GetContentRegionAvail().x;
+        ImGui::Button("new task..", ImVec2(windowWidth * 0.6, 0));
+        ImGui::PopStyleVar();
+        ImGui::PopStyleColor(4);
+        
+        ImGui::SameLine();
+        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.5f, 0.5f, 0.5f, 1.0f));
+        ImGui::Text("Deadline date");
+        ImGui::PopStyleColor();
+
+        // add task input fields
         ImGui::PushItemWidth(windowWidth * 0.6);
         ImGui::InputText("##taskName", buffName, IM_ARRAYSIZE(buffName));
         ImGui::PopItemWidth();
@@ -115,16 +123,17 @@ int main() {
 
         ImGui::SameLine();
         if (ImGui::Button("add task")) {
-            std::cout << buffName << std::endl;
-            std::cout << buffDeadline << std::endl;
+            taskManager.taskRepository.addTask(buffName, buffDeadline);
+
+            // clear input
             buffName[0] = '\0';
             buffDeadline[0] = '\0';
 
-            //taskManager.taskRepository.addTask("update README", "2025-04-10");
             // refresh tasks view
             tasks = taskManager.taskRepository.fetchTasks();
         }
-        ImGui::Separator();
+        //ImGui::Separator();
+        ImGui::Spacing();
 
         ImGuiTableFlags tableFlags = ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable;
         ImGui::BeginTable("table", 3, tableFlags);
