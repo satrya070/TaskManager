@@ -92,24 +92,35 @@ int main() {
         // GUI
         ImGui::Begin("Task Manager", nullptr, window_flags);
 
-        static char buff[200];
-        ImGui::InputText("default", buff, 200);
-        ImGui::SameLine();
-        static char buff2[32];
-        ImGui::InputText("default##2", buff2, 32);
+        static char buffName[256];
+        static char buffDeadline[11];
 
-        static int clicked = 0;
-        if (ImGui::Button("Delete task")) {
-            std::cout << "delete task!" << std::endl;
-            clicked++;
-        }
-        if (clicked) {
-            ImGui::SameLine();
-            ImGui::Text("Thanks for clicking me!");
-        }
+        // TODO implement GUI add fields
+        //ImGui::SameLine();
+        /*if (buffName[0] == '\0') {
+            ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.5f, 0.5f, 0.5f, 1.0f)); // Gray text
+            ImGui::TextUnformatted("Enter task name...");
+            ImGui::PopStyleColor();
+            ImGui::SetItemAllowOverlap(); // So input appears over this
+        }*/
+        float windowWidth = ImGui::GetContentRegionAvail().x;
+        ImGui::PushItemWidth(windowWidth * 0.6);
+        ImGui::InputText("##taskName", buffName, IM_ARRAYSIZE(buffName));
+        ImGui::PopItemWidth();
+        ImGui::SameLine();
+  
+        ImGui::PushItemWidth(100);
+        ImGui::InputText("##taskDeadline", buffDeadline, 11);
+        ImGui::PopItemWidth();
+
+        ImGui::SameLine();
         if (ImGui::Button("add task")) {
-            // TODO implement GUI add fields
-            taskManager.taskRepository.addTask("update README", "2025-04-10");
+            std::cout << buffName << std::endl;
+            std::cout << buffDeadline << std::endl;
+            buffName[0] = '\0';
+            buffDeadline[0] = '\0';
+
+            //taskManager.taskRepository.addTask("update README", "2025-04-10");
             // refresh tasks view
             tasks = taskManager.taskRepository.fetchTasks();
         }
