@@ -10,22 +10,13 @@
 #include <fstream>
 #include <sstream>
 #include "SqliteDatabase.h"
+#include "Renderer.h"
 
 #include "imgui.h"
 #include "imgui_impl_sdl3.h"
 #include "imgui_impl_opengl3.h"
 #include "SDL3/SDL.h"
 #include "SDL3/SDL_opengl.h"
-
-
-bool showAddTaskWindow = false;
-void addTaskWindow() {
-    if (showAddTaskWindow) {
-        ImGui::Begin("Add task", &showAddTaskWindow);
-        ImGui::Button("add task");
-        ImGui::End();
-    }
-}
 
 
 int main() {
@@ -37,7 +28,7 @@ int main() {
     std::vector<Task> archived_tasks = taskManager.taskRepository.fetchArchivedTasks();
     
     //----- GUI -----------------------------
-    if (!SDL_Init(SDL_INIT_VIDEO)) {
+    /*if (!SDL_Init(SDL_INIT_VIDEO)) {
         SDL_Log("Failed to initialize SDL: %s", SDL_GetError());
         return -1;
     }
@@ -95,7 +86,7 @@ int main() {
         static char buffName[256];
         static char buffDeadline[11];
 
-        //
+        // add task header elements
         ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.5f, 0.5f, 0.5f, 1.0f));
         ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));           // transparent background
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0, 0, 0, 0));    // no hover color
@@ -223,7 +214,16 @@ int main() {
     SDL_DestroyWindow(window);
     SDL_Quit();
 
-    std::cout << "done";
+    std::cout << "done";*/
+    
+    Renderer renderer;
+    if (!renderer.init()) {
+        std::cout << "Renderer initialization failed." << std::endl;
+        return -1;
+    }
+
+    renderer.run(taskManager);
+    
 
     return 0;
 }
