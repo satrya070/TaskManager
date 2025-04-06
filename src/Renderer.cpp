@@ -51,7 +51,6 @@ void Renderer::processEvents() {
 }
 
 static bool showArchiveWindow = false;
-
 void Renderer::render(Manager& taskManager) {
     // start imgui frame
     ImGui_ImplOpenGL3_NewFrame();
@@ -106,12 +105,11 @@ void Renderer::render(Manager& taskManager) {
         buffName[0] = '\0';
         buffDeadline[0] = '\0';
     }
-    //ImGui::Separator();
     ImGui::Spacing();
 
     ImGuiTableFlags tableFlags = ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable;
     ImGui::BeginTable("table", 4, tableFlags);
-    ImGui::TableSetupColumn("Task", ImGuiTableColumnFlags_WidthFixed, 200.f); // , ImGuiTableColumnFlags_WidthFixed);
+    ImGui::TableSetupColumn("Task", ImGuiTableColumnFlags_WidthFixed, 200.f);
     ImGui::TableSetupColumn("Created", ImGuiTableColumnFlags_WidthFixed, 100.f);
     ImGui::TableSetupColumn("Deadline", ImGuiTableColumnFlags_WidthFixed, 100.f);
     ImGui::TableHeadersRow();
