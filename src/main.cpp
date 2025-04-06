@@ -23,12 +23,8 @@ int main() {
     SqliteDatabase taskRepositoryDB("tasks_database.db");
     TaskRepository taskRepository(taskRepositoryDB);
     Manager taskManager(taskRepository);
-
-    // TODO add as statics
-    std::vector<Task> tasks = taskManager.taskRepository.fetchTasks();
-    std::vector<Task> archived_tasks = taskManager.taskRepository.fetchArchivedTasks();
     
-    // render GUI and all related functions
+    // renders GUI and all related functions
     Renderer renderer;
     if (!renderer.init()) {
         std::cout << "Renderer initialization failed." << std::endl;

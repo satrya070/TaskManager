@@ -2,6 +2,10 @@
 #include "Task.h"
 #include <iostream>
 
+static std::vector<Task> tasks;
+static std::vector<Task> archived_tasks;
+static bool showArchiveWindow = false;
+
 Renderer::Renderer() : window(nullptr), glContext(nullptr), isRunning(false) {}
 
 Renderer::~Renderer() {
@@ -50,7 +54,6 @@ void Renderer::processEvents() {
     }
 }
 
-static bool showArchiveWindow = false;
 void Renderer::render(Manager& taskManager) {
     // start imgui frame
     ImGui_ImplOpenGL3_NewFrame();
@@ -100,6 +103,8 @@ void Renderer::render(Manager& taskManager) {
     ImGui::SameLine();
     if (ImGui::Button("add task")) {
         taskManager.taskRepository.addTask(buffName, buffDeadline);
+        // refresh tasks on task getting added
+        tasks = taskManager.taskRepository.fetchTasks();
 
         // clear input
         buffName[0] = '\0';
@@ -114,7 +119,7 @@ void Renderer::render(Manager& taskManager) {
     ImGui::TableSetupColumn("Deadline", ImGuiTableColumnFlags_WidthFixed, 100.f);
     ImGui::TableHeadersRow();
 
-    for (const Task& task : taskManager.taskRepository.fetchTasks()) {
+    for (const Task& task : tasks) {
         ImGui::TableNextRow();
         ImGui::TableSetColumnIndex(0); ImGui::Text(task.getTaskName().c_str());
         ImGui::TableSetColumnIndex(1); ImGui::Text(task.getCreateDate().c_str());
@@ -125,6 +130,9 @@ void Renderer::render(Manager& taskManager) {
             taskManager.taskRepository.archiveTask(
                 task.getTaskId(), task.getTaskName(), task.getDeadlineDate()
             );
+            // refresh tasks and archived_task on task getting finished(and removed from tasks)
+            archived_tasks = taskManager.taskRepository.fetchArchivedTasks();
+            tasks = taskManager.taskRepository.fetchTasks();
 
             //abort loop with load updated tasks
             ImGui::PopID();
@@ -148,7 +156,7 @@ void Renderer::render(Manager& taskManager) {
         ImGui::TableSetupColumn("dateFinished", ImGuiTableColumnFlags_WidthFixed, 200.f);
         ImGui::TableHeadersRow();
 
-        for (const auto& task : taskManager.taskRepository.fetchArchivedTasks()) {
+        for (const auto& task : archived_tasks) {
             ImGui::TableNextRow();
             ImGui::TableSetColumnIndex(0); ImGui::Text(task.getTaskName().c_str());
             ImGui::TableSetColumnIndex(1); ImGui::Text(task.getDeadlineDate().c_str());
@@ -156,6 +164,8 @@ void Renderer::render(Manager& taskManager) {
             ImGui::PushID(task.getTaskId());
             if (ImGui::Button("Delete")) {
                 taskManager.taskRepository.deleteTask(task.getTaskId());
+                // refresh archived tasks on task getting deleted
+                archived_tasks = taskManager.taskRepository.fetchArchivedTasks();
 
                 //abort the current loop to load updated archive
                 ImGui::PopID();
@@ -177,6 +187,10 @@ void Renderer::render(Manager& taskManager) {
 }
 
 void Renderer::run(Manager& taskManager) {
+    // init static vars to need to exist before loop and are updated during
+    tasks = taskManager.taskRepository.fetchTasks();
+    archived_tasks = taskManager.taskRepository.fetchArchivedTasks();
+
     while (isRunning) {
         processEvents();
         render(taskManager);
