@@ -153,7 +153,7 @@ void Renderer::render(Manager& taskManager) {
 
         ImGui::BeginTable("asdf", 3, tableFlags);
         ImGui::TableSetupColumn("Task", ImGuiTableColumnFlags_WidthFixed, 200.f);
-        ImGui::TableSetupColumn("dateFinished", ImGuiTableColumnFlags_WidthFixed, 200.f);
+        ImGui::TableSetupColumn("Date finished", ImGuiTableColumnFlags_WidthFixed, 200.f);
         ImGui::TableHeadersRow();
 
         for (const auto& task : archived_tasks) {
